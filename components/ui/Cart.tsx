@@ -1,11 +1,14 @@
 "use client";
 
-import { QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
 import { Product } from "@/types";
 import Link from "next/link";
 import Currency from "./Currency";
 import useCart from "@/hooks/use-cart";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import SkeletonList from "./SkeletonList";
 
 interface CartProps {
   data: Product;
@@ -13,13 +16,28 @@ interface CartProps {
 
 export default function Cart({ data }: CartProps) {
   const cart = useCart();
+  const [isMounted, setIsMounted] = useState(false);
   const onRemove = () => {
     cart.removeItem(data.id);
   };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return <SkeletonList />;
+  }
+
   return (
     <li key={data.id} className="flex py-6 sm:py-10">
       <div className="flex-shrink-0">
-        <img
+        <Image
+          width={300}
+          height={300}
+          loading="lazy"
+          sizes="auto"
+          placeholder="empty"
           src={data.imageUrl}
           alt={data.album}
           className="h-24 w-24 rounded-md object-cover object-center sm:h-48 sm:w-48"

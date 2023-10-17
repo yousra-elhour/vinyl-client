@@ -1,10 +1,18 @@
+"use client";
+
 import Image from "next/image";
 import NewsLetterForm from "./NewsLetterForm";
+import { motion } from "framer-motion";
 
 export default function NewsLetter() {
   return (
     <>
-      <div className="bg-lightGray pt-12 mb-24">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2 }}
+        className="bg-lightGray pt-12 mb-24"
+      >
         <h1 className=" font-header text-[8cqw] text-black mb-[-4.2cqw] px-[1.6cqw]">
           NEWSLETTER
         </h1>
@@ -21,7 +29,7 @@ export default function NewsLetter() {
 
           <NewsLetterForm />
         </div>
-      </div>
+      </motion.div>
     </>
   );
 }

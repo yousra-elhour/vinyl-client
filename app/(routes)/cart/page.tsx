@@ -39,7 +39,7 @@ const CartPage = () => {
               ref={parent}
             >
               {cart.items.map((item) => (
-                <Cart data={item} />
+                <Cart data={item} key={item.id} />
               ))}
             </ul>
           </section>

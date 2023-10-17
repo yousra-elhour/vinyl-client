@@ -11,6 +11,12 @@ import { X } from "lucide-react";
 import { Billboard, Genre } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import autoAnimate from "@formkit/auto-animate";
+import AnimatedTitle from "./AnimatedTitle";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectCoverflow, Navigation } from "swiper/modules";
+import { Swiper as SwiperType } from "swiper";
+import "swiper/css/effect-coverflow";
+import "swiper/css";
 
 interface HeroSectionProps {
   billboards: Billboard[];
@@ -20,14 +26,23 @@ interface HeroSectionProps {
 const HeroSection = ({ genres, billboards }: HeroSectionProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [titleKey, setTitleKey] = useState(Date.now());
+  const navigationNextRef = useRef(null);
+  const navigationPrevRef = useRef(null);
   const parent = useRef(null);
+  const swiperRef = useRef<SwiperType>();
 
   const previousSlide = () => {
     setCurrentIndex((currentIndex - 1 + billboards.length) % billboards.length);
+    swiperRef.current?.slidePrev();
+    setTitleKey(Date.now());
   };
 
   const nextSlide = () => {
     setCurrentIndex((currentIndex + 1) % billboards.length);
+    swiperRef.current?.slideNext();
+    setTitleKey(Date.now());
   };
 
   const currentBillboard = billboards[currentIndex];
@@ -44,8 +59,21 @@ const HeroSection = ({ genres, billboards }: HeroSectionProps) => {
   const textColor = "text-white";
 
   useEffect(() => {
+    setIsMounted(true);
     parent.current && autoAnimate(parent.current);
   }, [parent]);
+
+  if (!isMounted) {
+    return (
+      <div
+        style={{
+          backgroundColor: `${currentBillboard.color}`,
+        }}
+        className={` auto h-screen max-w-screen justify-between current-billboard 
+        }`}
+      ></div>
+    );
+  }
 
   return (
     <>
@@ -53,121 +81,83 @@ const HeroSection = ({ genres, billboards }: HeroSectionProps) => {
         style={{
           backgroundColor: `${currentBillboard.color}`,
         }}
-        className={`${textColor} auto h-screen max-w-screen justify-between current-billboard 
+        className={`${textColor} auto h-screen max-w-screen justify-between current-billboard  items-center
          
         }`}
       >
-        <NavBar
-          genres={genres}
-          backgroundColor={currentBillboard.color}
-          className={`${currentBillboard.color} ${textColor} z-50 current-billboard `}
-        />
-        <AnimatePresence>
-          <motion.div
-            animate={{ opacity: 1 }}
-            transition={{
-              opacity: { ease: "linear" },
-            }}
-            style={{ backgroundColor: `${currentBillboard.color}` }}
-            className={` ${textColor} relative main flex items-center justify-center 3xl:h-[80vh]  lg:h-[80vh]  h-4/6 overflow-hidden current-billboard  `}
-            ref={parent}
-          >
-            {/* Previous Image */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <NavBar
+            genres={genres}
+            backgroundColor={currentBillboard.color}
+            className={`${currentBillboard.color} ${textColor} z-50 current-billboard `}
+          />
+        </motion.div>
 
-            <Image
-              src={billboards[previousIndex].imageUrl}
-              width={0}
-              height={0}
-              sizes="auto"
-              alt="Previous Vinyl"
-              className={`w-auto absolute z-10 object-contain max-w-screen lg:h-[25cqw] md:h-[30cqw] sm:h-[33cqw] h-[40cqw] cursor-pointer transition-opacity opacity-0 duration-[1s] ${
-                currentIndex === previousIndex ? "vinyl-animation previous" : ""
-              }`}
-              onLoadingComplete={(image) => image.classList.remove("opacity-0")}
-              style={{
-                left: "10%",
-                top: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
-              priority
-            />
-
-            {/* Current Image */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1, rotate: [-360, 0] }}
-              transition={{ duration: 0.5 }}
-              whileHover={{ rotate: [-360, 0] }}
-              whileTap={{ scale: 0.9 }}
-              className="z-50"
-            >
-              <Image
-                src={currentBillboard.imageUrl}
-                width={0}
-                height={0}
-                sizes="auto"
-                onClick={() => setModalOpen(true)}
-                alt="Current Vinyl"
-                className={`w-auto object-contain z-50 max-w-screen  lg:h-[39cqw] md:h-[45cqw] sm:h-[55cqw] h-[70cqw] cursor-pointer transition-opacity opacity-0 duration-[1s] ${
-                  currentIndex === previousIndex
-                    ? "vinyl-animation next"
-                    : currentIndex === nextIndex
-                    ? "vinyl-animation previous"
-                    : ""
-                }`}
-                onLoadingComplete={(image) =>
-                  image.classList.remove("opacity-0")
-                }
-                priority
-              />
-            </motion.div>
-
-            {/* Next Image */}
-
-            <Image
-              src={billboards[nextIndex].imageUrl}
-              width={0}
-              height={0}
-              sizes="auto"
-              alt="Next Vinyl"
-              className={`w-auto absolute z-10 object-contain max-w-screen lg:h-[25cqw] md:h-[30cqw] sm:h-[33cqw] h-[40cqw] cursor-pointer transition-opacity opacity-0 duration-[1s] ${
-                currentIndex === nextIndex ? "vinyl-animation next" : ""
-              }`}
-              onLoadingComplete={(image) => image.classList.remove("opacity-0")}
-              style={{
-                right: "10%",
-                top: "50%",
-                transform: "translate(50%, -50%)",
-              }}
-              priority
-            />
-
-            <div className="absolute z-0 font-bold heroTitle lg:leading-[28cqw] md:leading-loose sm:leading-[50cqw] leading-[70cqw]">
-              {currentBillboard.label.split(" ").map((word, index) => (
-                <div key={index}>
-                  {index === 0 ? (
-                    <motion.span className="block">{word}</motion.span>
-                  ) : (
-                    <motion.span>{word}</motion.span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
+        <Swiper
+          slidesPerView={"auto"}
+          spaceBetween={5}
+          effect={"coverflow"}
+          centeredSlides={true}
+          allowTouchMove={false}
+          loop={true}
+          coverflowEffect={{
+            rotate: 0,
+            stretch: 0,
+            scale: 0.6,
+          }}
+          onBeforeInit={(swiper) => {
+            swiperRef.current = swiper;
+          }}
+          modules={[EffectCoverflow, Navigation]}
+          className="mySwiper"
+        >
+          {billboards.concat(billboards).map((billboard, index) => (
+            <SwiperSlide key={index}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1, rotate: [-360, 0] }}
+                transition={{ duration: 0.5 }}
+                whileHover={{ rotate: [-360, 0] }}
+                whileTap={{ scale: 0.9 }}
+                className="z-50"
+              >
+                {" "}
+                <Image
+                  className="w-auto object-contain  cursor-pointer inset-10"
+                  width={0}
+                  height={0}
+                  sizes="auto"
+                  src={billboard.imageUrl}
+                  onClick={() => {
+                    if (index === currentIndex) {
+                      setModalOpen(true);
+                    }
+                  }}
+                  alt="Vinyl"
+                />
+              </motion.div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+        <AnimatedTitle key={titleKey} text={currentBillboard.label} />
         <div className="absolute lg:bottom-[4%] lg:right-[5%] md:bottom-[3%] md:right-[5%]  bottom-[2%] right-[5%] flex gap-[3cqw] z-50">
           <button
             onClick={previousSlide}
             title="Previous slide"
-            className="border-white border-2 rounded-full p-2"
+            ref={navigationPrevRef}
+            className="previous-slide border-white border-2 rounded-full p-2"
           >
             <ArrowLeftIcon className="lg:h-8 lg:w-8 md:h-6 md:w-6 sm:h-4 sm:w-5 h-5 w-5 text-white" />
           </button>
           <button
             onClick={nextSlide}
+            ref={navigationNextRef}
             title="Next slide"
-            className="border-white border-2 rounded-full p-2"
+            className="next-slide border-white border-2 rounded-full p-2"
           >
             <ArrowRightIcon className="lg:h-8 lg:w-8 md:h-6 md:w-6 sm:h-5 sm:w-5 h-5 w-5 text-white" />
           </button>

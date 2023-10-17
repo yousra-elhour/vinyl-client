@@ -160,6 +160,8 @@ const NavBar: React.FC<NavBarProps> = ({
 
   const [searchKeyword, setSearchKeyword] = useState("");
 
+  const [isMounted, setIsMounted] = useState(false);
+
   const cart = useCart();
 
   const handleSearchIconClick = () => {
@@ -176,16 +178,21 @@ const NavBar: React.FC<NavBarProps> = ({
   });
 
   React.useEffect(() => {
+    setIsMounted(true);
     window.addEventListener(
       "resize",
       () => window.innerWidth >= 960 && setOpenNav(false)
     );
   }, []);
 
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <nav
       style={{ backgroundColor: `${backgroundColor}` }}
-      className={`max-w-screen 2xl:px-20 xl:px-14 lg:px-12 sm:px-4 px-6 py-8 shadow-none border-none bg-opacity-100 sticky ${className}`}
+      className={`max-w-screen 2xl:px-20 xl:px-14 lg:px-12 sm:px-4 px-6 py-8 shadow-none border-none bg-opacity-100 sticky transition-all ${className}`}
     >
       {/* {genres.map((genre) => (
         <div>{genre.name}</div>
