@@ -76,7 +76,8 @@ export default function ListProducts({
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ ease: "easeOut", duration: 1 }}
+          transition={{ ease: "easeOut", duration: 1
+           }}
           className={` ${className}`}
         >
           {title ? (
