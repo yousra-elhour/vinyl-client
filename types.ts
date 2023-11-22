@@ -30,3 +30,11 @@ export interface Search {
   genreId: string;
   sort: string;
 }
+
+interface Track {
+  title: string;
+  artist: string;
+  preview_url: string;
+}
+
+export default Track;

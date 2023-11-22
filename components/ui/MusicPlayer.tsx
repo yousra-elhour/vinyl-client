@@ -81,7 +81,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ albumTracks }) => {
           {/* Use a unique class name for the play button */}
           <AudioPlayer
             ref={audioRef}
-            src={currentTrack.preview_url}
+            src={currentTrack?.preview_url}
             autoPlay={isPlaying}
             showJumpControls={false}
             layout="horizontal-reverse"
@@ -94,8 +94,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ albumTracks }) => {
           />
         </div>
         <div className="flex text-center justify-center gap-2">
-          <h2 className="text-sm text-gray-200">{currentTrack.artist} - </h2>
-          <h1 className="text-sm text-gray-200">&nbsp;{currentTrack.title}</h1>
+          <h2 className="text-sm text-gray-200">{currentTrack?.artist} - </h2>
+          <h1 className="text-sm text-gray-200">&nbsp;{currentTrack?.title}</h1>
         </div>
       </div>
     </div>

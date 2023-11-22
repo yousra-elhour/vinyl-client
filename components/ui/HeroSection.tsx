@@ -133,9 +133,7 @@ const HeroSection = ({ genres, billboards }: HeroSectionProps) => {
                   sizes="auto"
                   src={billboard.imageUrl}
                   onClick={() => {
-                    if (index === currentIndex) {
-                      setModalOpen(true);
-                    }
+                    setModalOpen(true);
                   }}
                   alt="Vinyl"
                 />

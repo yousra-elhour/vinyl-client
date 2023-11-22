@@ -1,4 +1,4 @@
-import { Product } from "@/types";
+import Track, { Product } from "@/types";
 import Image from "next/image";
 import AddToCart from "./AddToCart";
 import { fetchTracks } from "@/utils";
@@ -9,14 +9,15 @@ import Currency from "./Currency";
 
 interface ProductDetailsProps {
   product: Product;
+  albumTracks: Track[];
+  suggestedProducts: Product[];
 }
 
-export default async function ProductDetails({ product }: ProductDetailsProps) {
-  const spotifyApi = await fetchTracks(`${product.album} ${product.artist}`);
-  const albumTracks = spotifyApi.albumTracks;
-
-  const suggestedProducts = await getProducts({ genreId: product?.genre?.id });
-
+export default async function ProductDetails({
+  product,
+  albumTracks,
+  suggestedProducts,
+}: ProductDetailsProps) {
   return (
     <>
       <div className="sm:pt-16 pb-32  overflow-hidden">
