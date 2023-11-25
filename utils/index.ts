@@ -5,12 +5,12 @@ dotenv.config();
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-export async function fetchTracks(query: string) {
-  const maxRetries = 3; // Adjust the number of retries as needed
-  const retryDelay = 3000; // Adjust the delay between retries in milliseconds
+let accessToken = ""; // Store the access token globally
+let refreshToken = ""; // Store the refresh token globally
 
+async function getAccessToken() {
   try {
-    var authParameters = {
+    const authParameters = {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -22,13 +22,56 @@ export async function fetchTracks(query: string) {
         CLIENT_SECRET,
     };
 
-    // Get request using search to get Album ID
     const tokenResponse = await fetch(
       "https://accounts.spotify.com/api/token",
       authParameters
     );
     const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
+    accessToken = tokenData.access_token;
+    refreshToken = tokenData.refresh_token || refreshToken; // Update refresh token if a new one is provided
+  } catch (error) {
+    console.error("Error getting access token:", error);
+    throw error;
+  }
+}
+
+async function refresh() {
+  try {
+    const refreshParameters = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`,
+    };
+
+    const refreshResponse = await fetch(
+      "https://accounts.spotify.com/api/token",
+      refreshParameters
+    );
+
+    const refreshData = await refreshResponse.json();
+
+    if (refreshData.error) {
+      console.error("Error refreshing token:", refreshData.error);
+      // Handle the error, e.g., retrying or re-authenticating the user
+      return;
+    }
+
+    // Update the global accessToken variable with the new access token
+    accessToken = refreshData.access_token;
+    refreshToken = refreshData.refresh_token || refreshToken; // Update refresh token if a new one is provided
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    // Handle the error, e.g., retrying or re-authenticating the user
+  }
+}
+
+export async function fetchTracks(query: string) {
+  try {
+    if (!accessToken) {
+      await getAccessToken(); // Get initial access token
+    }
 
     var searchParameters = {
       method: "GET",
@@ -38,39 +81,24 @@ export async function fetchTracks(query: string) {
       },
     };
 
-    let attempts = 0;
-    let albumData;
-
-    do {
-      if (attempts > 0) {
-        console.log(`Retrying (${attempts}/${maxRetries})...`);
-        await new Promise((resolve) => setTimeout(resolve, retryDelay));
-      }
-
-      const albumResponse = await fetch(
-        "https://api.spotify.com/v1/search?q=" + query + "&type=album&limit=1",
-        searchParameters
-      );
-
-      albumData = await albumResponse.json();
-
-      attempts++;
-    } while (
-      attempts < maxRetries &&
-      (!albumData.albums ||
-        !albumData.albums.items ||
-        albumData.albums.items.length === 0)
+    // Get album ID
+    const albumResponse = await fetch(
+      "https://api.spotify.com/v1/search?q=" + query + "&type=album&limit=1",
+      searchParameters
     );
 
-    if (
-      !albumData.albums ||
-      !albumData.albums.items ||
-      albumData.albums.items.length === 0
-    ) {
-      throw new Error("No albums found");
+    const albumData = await albumResponse.json();
+
+    // Check if 'items' exists in the response
+    const items = albumData.albums?.items || [];
+
+    if (items.length === 0) {
+      // Attempt to refresh the token if no items are found
+      await refresh();
+      return fetchTracks(query); // Retry the fetchTracks function
     }
 
-    const albumId = albumData.albums.items[0].id;
+    const albumId = items[0].id;
 
     // Continue with the rest of your code...
 
@@ -93,7 +121,7 @@ export async function fetchTracks(query: string) {
       })
       .catch((error) => {
         console.error("Error fetching album tracks:", error);
-        // Handle the error appropriately, you might want to throw it further or log it
+        return []; // Return an empty array in case of an error
       });
 
     return {
@@ -102,7 +130,6 @@ export async function fetchTracks(query: string) {
     };
   } catch (error) {
     console.error("Error fetching album ID:", error);
-    // Handle the error appropriately, you might want to throw it further or log it
-    throw error; // Rethrow the error to be caught by the caller
+    throw error;
   }
 }
