@@ -127,13 +127,19 @@ const HeroSection = ({ genres, billboards }: HeroSectionProps) => {
               >
                 {" "}
                 <Image
-                  className="w-auto object-contain  cursor-pointer inset-10"
+                  className={`w-auto object-contain ${
+                    billboard.label === currentBillboard.label
+                      ? "cursor-pointer"
+                      : ""
+                  }  inset-10`}
                   width={0}
                   height={0}
                   sizes="auto"
                   src={billboard.imageUrl}
                   onClick={() => {
-                    setModalOpen(true);
+                    if (billboard.label === currentBillboard.label) {
+                      setModalOpen(true);
+                    }
                   }}
                   alt="Vinyl"
                 />

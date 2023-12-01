@@ -40,7 +40,7 @@ export default async function ProductDetails({ product }: ProductDetailsProps) {
                     sizes="auto"
                     src="/images/default-vinyl.png"
                     alt="Current Vinyl"
-                    className="left-[20%] bottom-[-9%] absolute  w-[85%]"
+                    className="left-[20%] bottom-[-9%] absolute  lg:w-[84%]  md:w-[84%] sm:w-[82%] w-[80%]"
                   />
                 </div>
               </div>

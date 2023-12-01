@@ -5,8 +5,7 @@ dotenv.config();
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-let accessToken = ""; // Store the access token globally
-let refreshToken = ""; // Store the refresh token globally
+let accessToken = "";
 
 async function getAccessToken() {
   try {
@@ -28,42 +27,9 @@ async function getAccessToken() {
     );
     const tokenData = await tokenResponse.json();
     accessToken = tokenData.access_token;
-    refreshToken = tokenData.refresh_token || refreshToken; // Update refresh token if a new one is provided
   } catch (error) {
     console.error("Error getting access token:", error);
     throw error;
-  }
-}
-
-async function refresh() {
-  try {
-    const refreshParameters = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`,
-    };
-
-    const refreshResponse = await fetch(
-      "https://accounts.spotify.com/api/token",
-      refreshParameters
-    );
-
-    const refreshData = await refreshResponse.json();
-
-    if (refreshData.error) {
-      console.error("Error refreshing token:", refreshData.error);
-      // Handle the error, e.g., retrying or re-authenticating the user
-      return;
-    }
-
-    // Update the global accessToken variable with the new access token
-    accessToken = refreshData.access_token;
-    refreshToken = refreshData.refresh_token || refreshToken; // Update refresh token if a new one is provided
-  } catch (error) {
-    console.error("Error refreshing token:", error);
-    // Handle the error, e.g., retrying or re-authenticating the user
   }
 }
 
@@ -93,8 +59,6 @@ export async function fetchTracks(query: string) {
     const items = albumData.albums?.items || [];
 
     if (items.length === 0) {
-      // Attempt to refresh the token if no items are found
-      await refresh();
       return fetchTracks(query); // Retry the fetchTracks function
     }
 
