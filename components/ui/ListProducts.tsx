@@ -13,6 +13,7 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import SkeletonList from "./SkeletonList";
 import { motion } from "framer-motion";
+import { Button } from "@material-tailwind/react";
 
 interface ListProductsProps {
   title?: string;
@@ -37,10 +38,17 @@ export default function ListProducts({
   const [openSideCart, setOpenSideCart] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const scrollRef = useRef(null);
+  const [showMoreCount, setShowMoreCount] = useState(9);
+  const [visibleProducts, setVisibleProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    setVisibleProducts(products.slice(0, showMoreCount));
+  }, [products, showMoreCount]);
+
+  const toggleShowMore = () => {
+    setShowMoreCount(showMoreCount + 9);
+  };
 
   if (!isMounted) {
     return <SkeletonList />;
@@ -52,7 +60,6 @@ export default function ListProducts({
 
   const responsive = {
     superLargeDesktop: {
-      // the naming can be any, depends on you.
       breakpoint: { max: 4000, min: 3000 },
       items: 5,
     },
@@ -76,8 +83,7 @@ export default function ListProducts({
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ ease: "easeOut", duration: 1
-           }}
+          transition={{ ease: "easeOut", duration: 1 }}
           className={` ${className}`}
         >
           {title ? (
@@ -93,8 +99,8 @@ export default function ListProducts({
             {filteredProducts.map((product) => (
               <div key={product.id} className="group relative">
                 <Image
-                  width={300} // Set an appropriate width
-                  height={300} // Set an appropriate height
+                  width={300}
+                  height={300}
                   loading="lazy"
                   sizes="auto"
                   placeholder="empty"
@@ -179,7 +185,7 @@ export default function ListProducts({
         <div
           className={`lg:mt-16 md:mt-16 sm:mt-10 mt-10 grid grid-cols-1 lg:gap-x-20 md:gap-x-10 sm:gap-x-6 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-3 xl:gap-x-25 ${className}`}
         >
-          {filteredProducts.map((product) => (
+          {visibleProducts.map((product) => (
             <div key={product.id} className="group relative">
               <Image
                 width={0}
@@ -224,6 +230,18 @@ export default function ListProducts({
             </div>
           ))}
         </div>
+
+        {/* Show more button */}
+        {filteredProducts.length > visibleProducts.length && (
+          <div className="flex justify-center">
+            <Button
+              onClick={toggleShowMore}
+              className="mt-16 text-white border-white border px-8 py-4  text-md rounded hover:bg-gray-700 "
+            >
+              Show more
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
