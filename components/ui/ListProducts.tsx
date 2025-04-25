@@ -102,7 +102,7 @@ export default function ListProducts({
                   width={300}
                   height={300}
                   loading="lazy"
-                  sizes="auto"
+                  sizes="100vw"
                   placeholder="empty"
                   src={product.imageUrl}
                   alt={product.album}
@@ -188,9 +188,9 @@ export default function ListProducts({
           {visibleProducts.map((product) => (
             <div key={product.id} className="group relative">
               <Image
-                width={0}
-                height={0}
-                sizes="auto"
+                width={300}
+                height={300}
+                sizes="100vw"
                 src={product.imageUrl}
                 alt={product.album}
                 className="aspect-square overflow-hidden w-auto group-hover:opacity-75"

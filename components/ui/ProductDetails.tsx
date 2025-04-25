@@ -26,18 +26,18 @@ export default async function ProductDetails({ product }: ProductDetailsProps) {
               <div className="flex   items-center justify-between lg:justify-start lg:items-start xl:items-center ">
                 <div className="flex relative flex-auto flex-grow  sm:w-9/12 px-4">
                   <Image
-                    width={0}
-                    height={0}
+                    width={400}
+                    height={400}
                     placeholder="empty"
-                    sizes="auto"
+                    sizes="100vw"
                     src={product.imageUrl}
                     alt="Current Cover"
                     className="z-20 w-[75%]"
                   />
                   <Image
-                    width={0}
-                    height={0}
-                    sizes="auto"
+                    width={400}
+                    height={400}
+                    sizes="100vw"
                     src="/images/default-vinyl.png"
                     alt="Current Vinyl"
                     className="left-[20%] bottom-[-9%] absolute  lg:w-[84%]  md:w-[84%] sm:w-[82%] w-[80%]"

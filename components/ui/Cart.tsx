@@ -36,7 +36,7 @@ export default function Cart({ data }: CartProps) {
           width={300}
           height={300}
           loading="lazy"
-          sizes="auto"
+          sizes="100vw"
           placeholder="empty"
           src={data.imageUrl}
           alt={data.album}

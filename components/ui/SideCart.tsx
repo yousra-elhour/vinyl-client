@@ -89,7 +89,7 @@ export default function SideCart({ open, setOpen }: SideCartProps) {
                                     width={300}
                                     height={300}
                                     loading="lazy"
-                                    sizes="auto"
+                                    sizes="100vw"
                                     placeholder="empty"
                                     src={item.imageUrl}
                                     alt={item.album}

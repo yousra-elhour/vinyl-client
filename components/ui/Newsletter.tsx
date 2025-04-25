@@ -19,9 +19,9 @@ export default function NewsLetter() {
 
         <div className="flex flex-col justify-center 2xl:px-20 xl:px-14 lg:px-12 sm:px-4 px-6 items-stretch gap-8  ">
           <Image
-            width={0}
-            height={0}
-            sizes="auto"
+            width={1200}
+            height={400}
+            sizes="100vw"
             src="/images/newsLetter.jpg"
             alt="Newsletter"
             className="w-auto"

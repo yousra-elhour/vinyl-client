@@ -132,9 +132,9 @@ const HeroSection = ({ genres, billboards }: HeroSectionProps) => {
                       ? "cursor-pointer"
                       : ""
                   }  inset-10`}
-                  width={0}
-                  height={0}
-                  sizes="auto"
+                  width={400}
+                  height={400}
+                  sizes="100vw"
                   src={billboard.imageUrl}
                   onClick={() => {
                     if (billboard.label === currentBillboard.label) {
@@ -186,16 +186,16 @@ const HeroSection = ({ genres, billboards }: HeroSectionProps) => {
                 <Image
                   src={currentBillboard.cover}
                   alt="Current Cover"
-                  width={0}
-                  height={0}
-                  sizes="auto"
+                  width={400}
+                  height={400}
+                  sizes="100vw"
                   className="z-20  lg:w-[30cqw] md:w-[60cqw] sm:w-[40cqw] w-[40cqw]"
                 />
                 <Image
                   src={currentBillboard.imageUrl}
-                  width={0}
-                  height={0}
-                  sizes="auto"
+                  width={400}
+                  height={400}
+                  sizes="100vw"
                   alt="Current Vinyl"
                   className="left-[45%] absolute sm:w-[40cqw] w-[40cqw] "
                 />
