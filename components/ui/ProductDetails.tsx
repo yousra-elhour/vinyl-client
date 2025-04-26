@@ -1,3 +1,5 @@
+"use client";
+
 import { Product } from "@/types";
 import Image from "next/image";
 import AddToCart from "./AddToCart";
@@ -6,16 +8,54 @@ import MusicPlayer from "./MusicPlayer";
 import ListProducts from "./ListProducts";
 import getProducts from "@/actions/get-products";
 import Currency from "./Currency";
+import { useState, useEffect } from "react";
 
 interface ProductDetailsProps {
   product: Product;
 }
 
-export default async function ProductDetails({ product }: ProductDetailsProps) {
-  const spotifyApi = await fetchTracks(`${product.album} ${product.artist}`);
-  const albumTracks = spotifyApi?.albumTracks;
+interface Track {
+  title: string;
+  artist: string;
+  preview_url: string | null;
+}
 
-  const suggestedProducts = await getProducts({ genreId: product?.genre?.id });
+export default function ProductDetails({ product }: ProductDetailsProps) {
+  const [loading, setLoading] = useState(true);
+  const [albumTracks, setAlbumTracks] = useState<Track[]>([]);
+  const [suggestedProducts, setSuggestedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Try to fetch tracks from Spotify
+        console.log(
+          "Fetching tracks from Spotify for:",
+          `${product.album} ${product.artist}`
+        );
+        const spotifyApi = await fetchTracks(
+          `${product.album} ${product.artist}`
+        );
+        console.log("Spotify API Response:", spotifyApi);
+
+        const tracks = spotifyApi?.albumTracks || [];
+        console.log("Processed Spotify Tracks:", tracks);
+
+        setAlbumTracks(tracks);
+
+        // Fetch suggested products
+        const suggested = await getProducts({ genreId: product?.genre?.id });
+        setSuggestedProducts(suggested);
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [product]);
 
   return (
     <>
@@ -61,29 +101,11 @@ export default async function ProductDetails({ product }: ProductDetailsProps) {
                 <p className="text-md text-gray-400 text-justify mb-10">
                   {product.description}
                 </p>
-
-                {/* <p className="mb-10 flex space-x-2 text-sm text-gray-400">
-                  {product.inStock ? (
-                    <CheckIcon
-                      className="h-5 w-5 flex-shrink-0 text-green-500"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <ClockIcon
-                      className="h-5 w-5 flex-shrink-0 text-gray-300"
-                      aria-hidden="true"
-                    />
-                  )}
-
-                  <span>
-                    {product.inStock
-                      ? "In stock"
-                      : `Ships in ${product.leadTime}`}
-                  </span>
-                </p> */}
               </div>
 
-              {product.isSpotify && <MusicPlayer albumTracks={albumTracks} />}
+              {!loading && albumTracks.length > 0 && (
+                <MusicPlayer albumTracks={albumTracks} />
+              )}
               <AddToCart data={product} />
             </div>
           </div>
@@ -91,11 +113,13 @@ export default async function ProductDetails({ product }: ProductDetailsProps) {
       </div>
 
       <div className="2xl:px-20 xl:px-14 lg:px-12 sm:px-4 px-6">
-        <ListProducts
-          products={suggestedProducts}
-          hasSlider={true}
-          currentProduct={product}
-        />
+        {!loading && suggestedProducts.length > 0 && (
+          <ListProducts
+            products={suggestedProducts}
+            hasSlider={true}
+            currentProduct={product}
+          />
+        )}
       </div>
     </>
   );
