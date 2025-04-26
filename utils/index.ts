@@ -102,7 +102,6 @@ async function searchByAlbum(query: string, searchParameters: any) {
       // Handle token expiration
       if (albumResponse.status === 401) {
         console.log("Token expired, refreshing...");
-        await getAccessToken();
         return []; // Caller will retry with new token
       }
 
