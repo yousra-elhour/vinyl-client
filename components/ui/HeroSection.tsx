@@ -81,7 +81,7 @@ const HeroSection = ({ genres, billboards }: HeroSectionProps) => {
         style={{
           backgroundColor: `${currentBillboard.color}`,
         }}
-        className={`${textColor} auto h-screen max-w-screen justify-between current-billboard  items-center
+        className={`${textColor} auto h-screen max-w-screen justify-between current-billboard  items-center overflow-hidden
          
         }`}
       >

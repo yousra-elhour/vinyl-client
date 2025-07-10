@@ -32,7 +32,7 @@ export default function NewsLetterForm() {
     },
   });
 
-  // Replace with your API URL
+  
 
   const onSubmit = async (data: NewsLetterForm) => {
     try {
